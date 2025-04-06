@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en_US">
+<head>
+    <meta content="width=device-width, initial-scale=1.0">
+    <title>File Browser</title>
+
+</head>
+<body>
+    <div class="upload_file">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="file">
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+
+	<table>
+		<tbody>
+			<tr>
+				<th valign="top">
+					<img src="/icon/blank.gif" alt="[ICO]">
+				</th>
+				<th>Name</th>
+				<th>Last modified</th>
+				<th>Size</th>
+				<th>Description</th>
+			</tr>
+
+			{{ range .Files }}
+			<tr>
+				<td valign="top">
+					{{ if .IsDir }}
+						<img src="/icon/folder.png" alt="folder">
+					{{ else }}
+						<img src="/icon/{{iconForExt .Filename}}" alt="[]">
+					{{ end }}
+				</td>
+				<td>
+					<a href="/files/{{ .Filename }}">{{ .Filename }}</a>
+				</td>
+				<td align="right">{{ .Date }}</td>
+				<td align="right">{{ .Size | formatSize }}</td>
+				<td>{{ .Description }}</td>
+
+			</tr>
+			{{ end }}
+
+		</tbody>
+	</table>
+</body>
+</html>
