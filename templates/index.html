@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en_US">
 <head>
+	<!-- <meta name="color-scheme" content="light dark"> -->
     <meta content="width=device-width, initial-scale=1.0">
     <title>File Browser</title>
-
+	<style>
+		table img {
+			vertical-align: middle;
+		}
+		</style>
 </head>
 <body>
     <div class="upload_file">
@@ -17,33 +22,34 @@
 		<tbody>
 			<tr>
 				<th valign="top">
-					<img src="/icon/blank.gif" alt="[ICO]">
+					<img src="static/icon/blank.png" alt="">
 				</th>
 				<th>Name</th>
 				<th>Last modified</th>
 				<th>Size</th>
-				<th>Description</th>
 			</tr>
+			<tr>
+                <th colspan="5">
+                    <hr>
+                </th>
+            </tr>
 
 			{{ range .Files }}
 			<tr>
 				<td valign="top">
 					{{ if .IsDir }}
-						<img src="/icon/folder.png" alt="folder">
+						<img src="/static/icon/folder.png" alt="folder">
 					{{ else }}
-						<img src="/icon/{{iconForExt .Filename}}" alt="[]">
+						<img src="/static/icon/{{iconForExt .Filename}}" alt="[]">
 					{{ end }}
 				</td>
 				<td>
-					<a href="/files/{{ .Filename }}">{{ .Filename }}</a>
+					<a href="{{ .Filename }}">{{ .Filename }}</a>
 				</td>
 				<td align="right">{{ .Date }}</td>
 				<td align="right">{{ .Size | formatSize }}</td>
-				<td>{{ .Description }}</td>
-
 			</tr>
 			{{ end }}
-
 		</tbody>
 	</table>
 </body>
