@@ -45,10 +45,8 @@ func (h *FileHandler) ListFilesHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Files []models.File
-		DefTheme bool
 	}{
 		Files: files,
-		DefTheme: false, // light
 	}
 
 	if err := h.tmpl.Execute(w, data); err != nil {

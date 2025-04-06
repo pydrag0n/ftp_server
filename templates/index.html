@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en_US">
 <head>
-	<!-- <meta name="color-scheme" content="light dark"> -->
+	<meta name="color-scheme" content="light dark">
     <meta content="width=device-width, initial-scale=1.0">
     <title>File Browser</title>
 	<style>
@@ -38,9 +38,10 @@
 			<tr>
 				<td valign="top">
 					{{ if .IsDir }}
-						<img src="/static/icon/folder.png" alt="folder">
+						<img src="/static/icon/{{if .DefTheme}}dark/{{else}}light/{{end}}folder.png">
 					{{ else }}
-						<img src="/static/icon/{{iconForExt .Filename}}" alt="[]">
+						<img src="/static/icon/{{if .DefTheme}}dark/{{else}}light/{{end}}{{ iconForExt .Filename }}">
+
 					{{ end }}
 				</td>
 				<td>

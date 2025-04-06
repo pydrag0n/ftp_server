@@ -28,6 +28,7 @@ func ScanFiles(path string) ([]models.File, error) {
 			Size:     info.Size(),
 			Date:     info.ModTime().Format("2006-01-02 15:04"),
 			IsDir:    entry.IsDir(),
+			DefTheme: false,
 		})
 	}
 	return fileList, nil

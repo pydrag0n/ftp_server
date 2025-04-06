@@ -5,6 +5,7 @@ type File struct {
     Size     	int64
     Date     	string
     IsDir    	bool
+	DefTheme bool
 }
 
 func (f *File) SetFilename(name string) {
@@ -21,4 +22,8 @@ func (f *File) SetDate(date string) {
 
 func (f *File) SetIsDir(isDir bool) {
 	f.IsDir = isDir
+}
+
+func (f *File) SetDefTheme(defTheme bool) {
+	f.DefTheme = defTheme
 }
