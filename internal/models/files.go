@@ -1,15 +1,21 @@
 package models
 
 type File struct {
-    Filename 	string
-    Size     	int64
-    Date     	string
-    IsDir    	bool
-	DefTheme bool
+    Filename string
+    Path     string // Относительный путь от корня
+    Size     int64
+    Date     string
+    IsDir    bool
+    DefTheme bool
 }
+
 
 func (f *File) SetFilename(name string) {
     f.Filename = name
+}
+
+func (f *File) SetPath(path string) {
+	f.Path = path
 }
 
 func (f *File) SetSize(size int64) {

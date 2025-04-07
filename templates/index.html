@@ -1,57 +1,49 @@
 <!DOCTYPE html>
-<html lang="en_US">
+<html>
 <head>
-	<meta name="color-scheme" content="light dark">
-    <meta content="width=device-width, initial-scale=1.0">
-    <title>File Browser</title>
-	<style>
-		table img {
-			vertical-align: middle;
+    <meta name="color-scheme" content="light dark">
+    <title>{{.CurrentPath}} - File Browser</title>
+    <style>
+		#file {
+			width: 80%;
 		}
-		</style>
+    </style>
 </head>
 <body>
-    <div class="upload_file">
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" id="file">
-            <input type="submit" value="Upload">
+	<h1>{{.CurrentPath}}</h1>
+        <form action="/upload?path={{.CurrentPath}}" method="post" enctype="multipart/form-data">
+            <button type="submit">Upload</button>
+            <input type="file" name="file" id="file" required>
         </form>
-    </div>
 
-	<table>
-		<tbody>
+    <table>
+        <tbody>
 			<tr>
-				<th valign="top">
-					<img src="static/icon/blank.png" alt="">
-				</th>
+				<th></th>
 				<th>Name</th>
-				<th>Last modified</th>
+				<th>Last Modified</th>
 				<th>Size</th>
 			</tr>
-			<tr>
-                <th colspan="5">
-                    <hr>
-                </th>
+			<tr><th colspan="5"><hr></th></tr>
+
+            {{ range .Files }}
+            <tr>
+                <td>
+                    {{ if .IsDir }}
+                        <img src="/static/icon/light/folder.png" valign="top">
+                    {{ else }}
+                        <img src="/static/icon/light/{{ iconForExt .Filename }}" valign="top">
+                    {{ end }}
+                </td>
+                <td>
+					<a href="/files{{ .Path }}" title="{{ .Filename }}">{{ .Filename }}{{ if .IsDir }}/{{ end }}</a>
+                </td>
+                <td align="right">{{ .Date }}</td>
+                <td align="right">{{ if .IsDir }}-{{ else }}{{ .Size | formatSize }}{{ end }}</td>
             </tr>
+            {{ end }}
 
-			{{ range .Files }}
-			<tr>
-				<td valign="top">
-					{{ if .IsDir }}
-						<img src="/static/icon/{{if .DefTheme}}dark/{{else}}light/{{end}}folder.png">
-					{{ else }}
-						<img src="/static/icon/{{if .DefTheme}}dark/{{else}}light/{{end}}{{ iconForExt .Filename }}">
-
-					{{ end }}
-				</td>
-				<td>
-					<a href="{{ .Filename }}">{{ .Filename }}</a>
-				</td>
-				<td align="right">{{ .Date }}</td>
-				<td align="right">{{ .Size | formatSize }}</td>
-			</tr>
-			{{ end }}
-		</tbody>
-	</table>
+        </tbody>
+    </table>
 </body>
 </html>
