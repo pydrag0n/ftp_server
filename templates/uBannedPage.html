@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доступ заблокирован</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffeaea 0%, #ffcccc 100%);
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            transform: scale(0.9);
+            animation: scaleUp 0.5s ease forwards;
+        }
+
+        @keyframes scaleUp {
+            to { transform: scale(1); }
+        }
+
+        .icon {
+            font-size: 80px;
+            color: #ff4444;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 2.2em;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+        }
+
+        .unban-btn {
+            display: inline-block;
+            background: #ff4444;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .unban-btn:hover {
+            background: white;
+            color: #ff4444;
+            border-color: #ff4444;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255,68,68,0.3);
+        }
+
+        .ip-address {
+            color: #ff4444;
+            font-weight: 600;
+            word-break: break-all;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="fas fa-ban icon"></i>
+        <h1>Доступ ограничен</h1>
+        <p>Ваш IP-адрес <span class="ip-address">{{ .IP }}</span> был заблокирован за нарушение правил использования сервиса.</p>
+        <p>Если вы считаете, что это произошло по ошибке, вы можете подать апелляцию для восстановления доступа.</p>
+        <a href="https://t.me/urancore" class="unban-btn">Подать заявку на разблокировку</a>
+    </div>
+</body>
+</html>

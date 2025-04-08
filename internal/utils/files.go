@@ -9,7 +9,35 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"crypto/rand"
+    "encoding/hex"
+    "sync"
+    "time"
+
 )
+
+type Session struct {
+    Data      map[string]interface{}
+    ExpiresAt time.Time
+}
+
+type SessionStore struct {
+    Sessions map[string]Session
+    MU       sync.Mutex
+}
+
+var Store = &SessionStore{
+    Sessions: make(map[string]Session),
+}
+
+
+func GenerateSessionID() string {
+    b := make([]byte, 32)
+    if _, err := rand.Read(b); err != nil {
+        panic(err)
+    }
+    return hex.EncodeToString(b)
+}
 
 func ScanFiles(path string, basePath string) ([]models.File, error) {
     var fileList []models.File

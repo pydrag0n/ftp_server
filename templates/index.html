@@ -1,20 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="color-scheme" content="light dark">
+    <meta name="color-scheme">
     <title>{{.CurrentPath}} - File Browser</title>
+
     <style>
 		#file {
 			width: 80%;
 		}
+		body.light {
+			background-color: white;
+			color: black;
+		}
+		body.dark {
+			background-color: #1a1a1a;
+			color: #e6e6e6;
+		}
+		body.dark a {
+			color: #84c8ff;
+		}
     </style>
+
 </head>
-<body>
+<body class="{{.Theme}}">
 	<h1>{{.CurrentPath}}</h1>
         <form action="/upload?path={{.CurrentPath}}" method="post" enctype="multipart/form-data">
             <button type="submit">Upload</button>
             <input type="file" name="file" id="file" required>
         </form>
+
+		<form action="/createdir?path={{.CurrentPath}}" method="post">
+			<input type="text" name="dirname" id="dirname" placeholder="write dir name...">
+            <button type="submit">create dir</button>
+        </form>
+
+		<form action="/set-theme" method="POST">
+			<input type="hidden" name="theme" value="{{ if eq .Theme "light" }}dark{{ else }}light{{ end }}">
+			<button type="submit">Toggle theme</button>
+		</form>
 
     <table>
         <tbody>
@@ -25,14 +48,13 @@
 				<th>Size</th>
 			</tr>
 			<tr><th colspan="5"><hr></th></tr>
-
             {{ range .Files }}
             <tr>
                 <td>
                     {{ if .IsDir }}
-                        <img src="/static/icon/light/folder.png" valign="top">
+                        <img src="/static/icon/{{ $.Theme }}/folder.png" valign="top">
                     {{ else }}
-                        <img src="/static/icon/light/{{ iconForExt .Filename }}" valign="top">
+                        <img src="/static/icon/{{ $.Theme }}/{{ iconForExt .Filename }}" valign="top">
                     {{ end }}
                 </td>
                 <td>
