@@ -36,7 +36,7 @@
 
 	<br>
 
-	<div class="search-box">
+	<div>
 		<input type="text" id="searchInput" placeholder="Search by name..." style="padding: 5px">
 	</div>
 
@@ -51,7 +51,7 @@
 			</tr>
 			<tr><th colspan="5"><hr></th></tr>
 			{{ range .Files }}
-			<tr>
+			<tr class="file-row">
 				<td>
 					{{ if .IsDir }}
 						<img src="/static/icon/{{ $.Theme }}/folder.png" valign="top">

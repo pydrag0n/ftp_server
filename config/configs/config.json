@@ -1,0 +1,16 @@
+{
+	"server": {
+		"host": "localhost",
+		"port": 2121,
+		"timeout": 30,
+		"debug": false
+	},
+
+	"FTP": {
+		"root_path": "./files"
+	},
+
+	"Template": {
+		"path": "templates/*.html"
+	}
+}
