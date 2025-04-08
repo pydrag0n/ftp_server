@@ -15,16 +15,16 @@ const (
 )
 
 type Config struct {
-	Server   ServerConfig   `json:"server"`
-	FTP      FTPConfig      `json:"FTP"`
+	Server ServerConfig `json:"server"`
+	FTP FTPConfig `json:"FTP"`
 	Template TemplateConfig `json:"template"`
 }
 
 type ServerConfig struct {
-	Host    string `json:"host"`
-	Port    int    `json:"port"`
-	Timeout int    `json:"timeout"`
-	Debug   bool   `json:"debug"`
+	Host string `json:"host"`
+	Port int `json:"port"`
+	Timeout int `json:"timeout"`
+	Debug bool `json:"debug"`
 }
 
 type FTPConfig struct {
@@ -47,30 +47,13 @@ func Load(path string) (*Config, error) {
 		return nil, fmt.Errorf("[ERROR] parse JSON: %w", err)
 	}
 
-		if config.FTP.RootPath, err = filepath.Abs(config.FTP.RootPath); err != nil {
-			return nil, fmt.Errorf("[ERROR] invalid FTP path: %w", err)
-		}
+	if config.FTP.RootPath, err = filepath.Abs(config.FTP.RootPath); err != nil {
+		return nil, fmt.Errorf("[ERROR] invalid FTP path: %w", err)
+	}
 
-		if config.Template.Path, err = filepath.Abs(config.Template.Path); err != nil {
-			return nil, fmt.Errorf("[ERROR] invalid template path: %w", err)
-		}
+	if config.Template.Path, err = filepath.Abs(config.Template.Path); err != nil {
+		return nil, fmt.Errorf("[ERROR] invalid template path: %w", err)
+	}
 
 	return &config, nil
 }
-
-
-/*
-example:
-	func main() {
-		config, err := Load("./configs/config.json")
-		if err != nil {
-			fmt.Printf("[ERROR] Load config: %v\n", err)
-			return
-		}
-
-		jsonData, _ := json.MarshalIndent(config, "*", "////")
-		fmt.Println("########## [INFO] Init Config ##########")
-		fmt.Println(string(jsonData))
-		fmt.Println("########################################")
-	}
-*/

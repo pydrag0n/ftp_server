@@ -15,7 +15,7 @@ type IPStore struct {
 type LoggingResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
-	size       int
+	size int
 }
 
 func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
@@ -25,14 +25,14 @@ func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		next(lrw, r)
 
 		log.Printf("[%s] %s %s %d %dbytes %v",
-			r.RemoteAddr,
-			r.Method,
-			r.URL.Path,
-			lrw.statusCode,
-			lrw.size+int(r.ContentLength),
-			time.Since(start),
-		)
-	}
+		r.RemoteAddr,
+		r.Method,
+		r.URL.Path,
+		lrw.statusCode,
+		lrw.size+int(r.ContentLength),
+		time.Since(start),
+	)
+}
 }
 
 func NewIPStore() *IPStore {

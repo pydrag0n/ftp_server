@@ -1,18 +1,10 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<meta name="color-scheme" content="{{ if eq .Theme "light" }}light{{ else }}dark{{ end }}">
 	<title>FTP - {{.CurrentPath}}</title>
-
-	<style>
-		#file {
-			width: 80%;
-		}
-	</style>
-
+	<style>#file {width: 80%;}</style>
 </head>
-
 <body>
 	<h1>{{.CurrentPath}}</h1>
 	<form action="/upload?path={{.CurrentPath}}" method="post" enctype="multipart/form-data">
@@ -36,9 +28,7 @@
 
 	<br>
 
-	<div>
-		<input type="text" id="searchInput" placeholder="Search by name..." style="padding: 5px">
-	</div>
+	<input type="text" id="searchInput" placeholder="Search by name..." style="padding: 5px">
 
 	<table>
 		<tbody>
@@ -54,9 +44,9 @@
 			<tr class="file-row">
 				<td>
 					{{ if .IsDir }}
-						<img src="/static/icon/{{ $.Theme }}/folder.png" valign="top">
+					<img src="/static/icon/{{ $.Theme }}/folder.png" valign="top">
 					{{ else }}
-						<img src="/static/icon/{{ $.Theme }}/{{ iconForExt .Filename }}" valign="top">
+					<img src="/static/icon/{{ $.Theme }}/{{ iconForExt .Filename }}" valign="top">
 					{{ end }}
 				</td>
 				<td class="filename">
@@ -88,5 +78,4 @@
 		});
 	</script>
 </body>
-
 </html>

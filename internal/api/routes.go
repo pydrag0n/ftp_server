@@ -3,28 +3,17 @@ package api
 import "net/http"
 
 type Route struct {
-    Method      string          // HTTP-метод: GET, POST, PUT и т.д.
-    Path        string          // URL-путь, например: "/users/{id}"
-    Handler     http.HandlerFunc     // Функция-обработчик запроса
-    Middlewares []MiddlewareFunc // Список middleware (опционально)
+	Method string
+	Path string
+	Handler http.HandlerFunc
+	Middlewares []MiddlewareFunc
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
-
-/*
-example:
-	route := NewRouteFunc(
-		"GET",
-		"/hello",
-		HelloHandler,
-		LoggingMiddleware,
-		HeaderMiddleware,
-	)
-*/
 func NewRouteFunc(method, path string,
-					handler http.HandlerFunc,
-					middlewares ...MiddlewareFunc) Route {
+handler http.HandlerFunc,
+middlewares ...MiddlewareFunc) Route {
 	return Route{
 		Method: method,
 		Path: path,
