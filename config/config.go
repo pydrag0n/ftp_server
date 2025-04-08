@@ -4,5 +4,5 @@ const (
 	RootPath      	= "./files"
 	IconPath 		= "/static/icon/"
 	ServerPort    	= ":2121"
-	TemplatePath  	= "templates/index.html"
+	TemplatePath  	= "templates/*.html"
 )

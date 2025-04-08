@@ -27,7 +27,7 @@ func NewFileHandler(templatePath string) *FileHandler {
         "splitPath": func(path string) []string {
             return strings.Split(strings.Trim(path, "/"), "/")
         },
-    }).ParseFiles(templatePath))
+    }).ParseGlob(templatePath))
 
     return &FileHandler{tmpl: tmpl}
 }

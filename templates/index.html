@@ -1,46 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta name="color-scheme">
-    <title>{{.CurrentPath}} - File Browser</title>
 
-    <style>
+<head>
+	<meta name="color-scheme" content="{{ if eq .Theme "light" }}light{{ else }}dark{{ end }}">
+	<title>FTP - {{.CurrentPath}}</title>
+
+	<style>
 		#file {
 			width: 80%;
 		}
-		body.light {
-			background-color: white;
-			color: black;
-		}
-		body.dark {
-			background-color: #1a1a1a;
-			color: #e6e6e6;
-		}
-		body.dark a {
-			color: #84c8ff;
-		}
-    </style>
+	</style>
 
 </head>
-<body class="{{.Theme}}">
+
+<body>
 	<h1>{{.CurrentPath}}</h1>
-        <form action="/upload?path={{.CurrentPath}}" method="post" enctype="multipart/form-data">
-            <button type="submit">Upload</button>
-            <input type="file" name="file" id="file" required>
-        </form>
+	<form action="/upload?path={{.CurrentPath}}" method="post" enctype="multipart/form-data">
+		<button type="submit">Upload</button>
+		<input type="file" name="file" id="file" required>
+	</form>
 
-		<form action="/createdir?path={{.CurrentPath}}" method="post">
-			<input type="text" name="dirname" id="dirname" placeholder="write dir name...">
-            <button type="submit">create dir</button>
-        </form>
+	<br>
 
-		<form action="/set-theme" method="POST">
-			<input type="hidden" name="theme" value="{{ if eq .Theme "light" }}dark{{ else }}light{{ end }}">
-			<button type="submit">Toggle theme</button>
-		</form>
+	<form action="/createdir?path={{.CurrentPath}}" method="post">
+		<button type="submit">Create</button>
+		<input type="text" name="dirname" id="dirname" placeholder="Directory...">
+	</form>
 
-    <table>
-        <tbody>
+	<br>
+
+	<form action="/set-theme" method="POST">
+		<input type="hidden" name="theme" value="{{ if eq .Theme "light" }}dark{{ else }}light{{ end }}">
+		<button type="submit">Toggle theme</button>
+	</form>
+
+	<br>
+
+	<div class="search-box">
+		<input type="text" id="searchInput" placeholder="Search by name..." style="padding: 5px">
+	</div>
+
+	<table>
+		<tbody>
+			<tr><th colspan="5"><hr></th></tr>
 			<tr>
 				<th></th>
 				<th>Name</th>
@@ -48,24 +50,43 @@
 				<th>Size</th>
 			</tr>
 			<tr><th colspan="5"><hr></th></tr>
-            {{ range .Files }}
-            <tr>
-                <td>
-                    {{ if .IsDir }}
-                        <img src="/static/icon/{{ $.Theme }}/folder.png" valign="top">
-                    {{ else }}
-                        <img src="/static/icon/{{ $.Theme }}/{{ iconForExt .Filename }}" valign="top">
-                    {{ end }}
-                </td>
-                <td>
+			{{ range .Files }}
+			<tr>
+				<td>
+					{{ if .IsDir }}
+						<img src="/static/icon/{{ $.Theme }}/folder.png" valign="top">
+					{{ else }}
+						<img src="/static/icon/{{ $.Theme }}/{{ iconForExt .Filename }}" valign="top">
+					{{ end }}
+				</td>
+				<td class="filename">
 					<a href="/files{{ .Path }}" title="{{ .Filename }}">{{ .Filename }}{{ if .IsDir }}/{{ end }}</a>
-                </td>
-                <td align="right">{{ .Date }}</td>
-                <td align="right">{{ if .IsDir }}-{{ else }}{{ .Size | formatSize }}{{ end }}</td>
-            </tr>
-            {{ end }}
+				</td>
+				<td align="right">{{ .Date }}</td>
+				<td align="right">{{ if .IsDir }}-{{ else }}{{ .Size | formatSize }}{{ end }}</td>
+			</tr>
+			{{ end }}
+		</tbody>
+	</table>
 
-        </tbody>
-    </table>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const searchInput = document.getElementById('searchInput');
+			const rows = document.querySelectorAll('.file-row');
+			searchInput.addEventListener('input', function (e) {
+				const searchTerm = e.target.value.toLowerCase();
+
+				rows.forEach(row => {
+					const filename = row.querySelector('.filename').textContent.toLowerCase();
+					if (filename.includes(searchTerm)) {
+						row.style.display = 'table-row';
+					} else {
+						row.style.display = 'none';
+					}
+				});
+			});
+		});
+	</script>
 </body>
+
 </html>

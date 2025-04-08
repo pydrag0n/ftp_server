@@ -18,13 +18,13 @@ func main() {
 	fileHandler := handlers.NewFileHandler(config.TemplatePath)
 	mux := http.NewServeMux()
 
-	ipStore.BanIP("")
+	// ipStore.BanIP("26.250.92.105")
 
 	fs := http.FileServer(http.Dir("static/"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	mux.HandleFunc("/banned", ipStore.BannedIPMiddleware(ipStore.BannedPage))
-	mux.HandleFunc("/files/", handlers.LoggingMiddleware(ipStore.BannedIPMiddleware(fileHandler.ListFilesHandler)))
+	mux.HandleFunc("/", handlers.LoggingMiddleware(ipStore.BannedIPMiddleware(fileHandler.ListFilesHandler)))
 	mux.HandleFunc("/set-theme", handlers.SetThemeHandler)
 	mux.HandleFunc("/upload", handlers.LoggingMiddleware(handlers.UploadFileHandler))
 	mux.HandleFunc("/createdir", handlers.LoggingMiddleware(handlers.CreateDirHandler))
