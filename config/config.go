@@ -4,14 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
-)
-
-const (
-	RootPath = "./files"
-	TemplatePath = "templates/*.html"
-	IconPath = "static/icon"
-	ServerPort = ":1212"
 )
 
 type Config struct {
@@ -45,14 +37,6 @@ func Load(path string) (*Config, error) {
 	var config Config
 	if err := json.Unmarshal(file, &config); err != nil {
 		return nil, fmt.Errorf("[ERROR] parse JSON: %w", err)
-	}
-
-	if config.FTP.RootPath, err = filepath.Abs(config.FTP.RootPath); err != nil {
-		return nil, fmt.Errorf("[ERROR] invalid FTP path: %w", err)
-	}
-
-	if config.Template.Path, err = filepath.Abs(config.Template.Path); err != nil {
-		return nil, fmt.Errorf("[ERROR] invalid template path: %w", err)
 	}
 
 	return &config, nil

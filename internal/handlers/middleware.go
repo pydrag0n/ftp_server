@@ -66,3 +66,21 @@ func (store *IPStore) BanIP(ip string) {
 func (store *IPStore) UnbanIP(ip string) {
 	delete(store.bannedIPs, ip)
 }
+
+func MethodCheck(method string, h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != method {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
+}
+
+func ApplyMiddleware(h http.Handler,
+			middlewares ...func(http.Handler) http.Handler) http.Handler {
+	for _, mw := range middlewares {
+		h = mw(h)
+	}
+	return h
+}

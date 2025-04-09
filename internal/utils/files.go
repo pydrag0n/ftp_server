@@ -2,11 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"ftp/config"
-	"ftp/internal/models"
-	"log"
 	"math"
-	"os"
 	"path/filepath"
 	"strings"
 	"crypto/rand"
@@ -37,47 +33,6 @@ func GenerateSessionID() string {
 		panic(err)
 	}
 	return hex.EncodeToString(b)
-}
-
-func ScanFiles(path string, basePath string) ([]models.File, error) {
-	var fileList []models.File
-
-	entries, err := os.ReadDir(path)
-	if err != nil {
-		return nil, fmt.Errorf("scan error for %s: %w", path, err)
-	}
-
-	// Добавляем ссылку на родительскую директорию
-	if path != config.RootPath {
-		fileList = append(fileList, models.File{
-			Filename: "..",
-			Path: filepath.Dir(basePath),
-			IsDir: true,
-		})
-	}
-
-	for _, entry := range entries {
-		info, err := entry.Info()
-		if err != nil {
-			log.Printf("Skipping problematic entry %s: %v", entry.Name(), err)
-			continue
-		}
-
-		relPath := filepath.Join(basePath, entry.Name())
-		if basePath == "/" {
-			relPath = "/" + entry.Name()
-		}
-
-		fileList = append(fileList, models.File{
-			Filename: entry.Name(),
-			Path: relPath,
-			Size: info.Size(),
-			Date: info.ModTime().Format("2006-01-02 15:04"),
-			IsDir: entry.IsDir(),
-		})
-	}
-
-	return fileList, nil
 }
 
 func HasInvalidChars(filename string) bool {

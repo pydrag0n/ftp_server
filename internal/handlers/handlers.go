@@ -9,18 +9,21 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
+	"html/template"
 
 	"ftp/config"
 	"ftp/internal/models"
 	"ftp/internal/utils"
+	"ftp/internal/models/router"
 )
 
-type FileHandler struct {
-	tmpl *template.Template
+
+type ServerFTPWrapper struct {
+	*router.ServerFTP
 }
 
-func NewFileHandler(templatePath string) *FileHandler {
+
+func NewServerFTPWrappper(templatePath string, config *config.Config) *ServerFTPWrapper {
 	tmpl := template.Must(template.New("index.html").Funcs(template.FuncMap{
 		"iconForExt": utils.GetIconForExtension,
 		"formatSize": utils.FormatSize,
@@ -29,17 +32,22 @@ func NewFileHandler(templatePath string) *FileHandler {
 		},
 	}).ParseGlob(templatePath))
 
-	return &FileHandler{tmpl: tmpl}
+	return &ServerFTPWrapper{
+		ServerFTP: &router.ServerFTP{
+			Cfg:  config,
+			Tmpl: tmpl,
+		},
+	}
 }
 
 
-func (h *FileHandler) ListFilesHandler(w http.ResponseWriter, r *http.Request) {
-	currentPath := strings.TrimPrefix(r.URL.Path, "/files")
+func (sftp *ServerFTPWrapper) ListFilesHandler(w http.ResponseWriter, r *http.Request) {
+	currentPath := strings.TrimPrefix(r.URL.Path, sftp.Cfg.FTP.RootPath[1:])
 	if currentPath == "" {
 		currentPath = "/"
 	}
 
-	fullPath := filepath.Join(config.RootPath, currentPath)
+	fullPath := filepath.Join(sftp.Cfg.FTP.RootPath, currentPath)
 
 	// Проверка существования пути
 	fi, err := os.Stat(fullPath)
@@ -56,7 +64,7 @@ func (h *FileHandler) ListFilesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Получаем список файлов
-	files, err := utils.ScanFiles(fullPath, currentPath)
+	files, err := sftp.ScanFiles(fullPath, currentPath)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Printf("Error scanning directory %s: %v", fullPath, err)
@@ -73,13 +81,13 @@ func (h *FileHandler) ListFilesHandler(w http.ResponseWriter, r *http.Request) {
 		Files: files,
 	}
 
-	if err := h.tmpl.Execute(w, data); err != nil {
+	if err := sftp.ServerFTP.Tmpl.Execute(w, data); err != nil {
 		log.Printf("Template execution error: %v, path: %s", err, currentPath)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
 
-func CreateDirHandler(w http.ResponseWriter, r *http.Request) {
+func (sftp *ServerFTPWrapper) CreateDirHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -102,10 +110,10 @@ func CreateDirHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Собираем полный путь до новой директории
-	fullPath := filepath.Join(config.RootPath, currentDir, dirname)
+	fullPath := filepath.Join(sftp.Cfg.FTP.RootPath, currentDir, dirname)
 
 	// Нормализуем пути для безопасности
-	cleanedRoot := filepath.Clean(config.RootPath)
+	cleanedRoot := filepath.Clean(sftp.Cfg.FTP.RootPath)
 	cleanedFullPath := filepath.Clean(fullPath)
 
 	// Проверяем, что конечный путь находится внутри корневой директории
@@ -129,14 +137,14 @@ func CreateDirHandler(w http.ResponseWriter, r *http.Request) {
 
 
 
-func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
+func (sftp *ServerFTPWrapper) UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	currentPath := r.URL.Query().Get("path")
-	fullPath := filepath.Join(config.RootPath, currentPath)
+	fullPath := filepath.Join(sftp.Cfg.FTP.RootPath, currentPath)
 
 	err := r.ParseMultipartForm(10 << 20) // 10 MB
 	if err != nil {
@@ -231,4 +239,46 @@ func SetThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
 	}
+}
+
+
+func (sftp *ServerFTPWrapper) ScanFiles(path string, basePath string) ([]models.File, error) {
+	var fileList []models.File
+
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return nil, fmt.Errorf("scan error for %s: %w", path, err)
+	}
+
+	// Добавляем ссылку на родительскую директорию
+	if path != sftp.Cfg.FTP.RootPath {
+		fileList = append(fileList, models.File{
+			Filename: "..",
+			Path: filepath.Dir(basePath),
+			IsDir: true,
+		})
+	}
+
+	for _, entry := range entries {
+		info, err := entry.Info()
+		if err != nil {
+			log.Printf("Skipping problematic entry %s: %v", entry.Name(), err)
+			continue
+		}
+
+		relPath := filepath.Join(basePath, entry.Name())
+		if basePath == "/" {
+			relPath = "/" + entry.Name()
+		}
+
+		fileList = append(fileList, models.File{
+			Filename: entry.Name(),
+			Path: relPath,
+			Size: info.Size(),
+			Date: info.ModTime().Format("2006-01-02 15:04"),
+			IsDir: entry.IsDir(),
+		})
+	}
+
+	return fileList, nil
 }
