@@ -21,19 +21,16 @@ func main() {
 	}
 
 
-	ipStore := handlers.NewIPStore()
 	SFTPWrapper := handlers.NewServerFTPWrappper(cfg.Template.Path, cfg)
-	mux := http.NewServeMux()
+	MainMux := http.NewServeMux()
 
 	fs := http.FileServer(http.Dir("static/"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	MainMux.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	mux.HandleFunc("/banned", ipStore.BannedIPMiddleware(ipStore.BannedPage))
-	mux.HandleFunc("/", handlers.LoggingMiddleware(ipStore.BannedIPMiddleware(SFTPWrapper.ListFilesHandler)))
-	mux.HandleFunc("/set-theme", handlers.SetThemeHandler)
-	mux.HandleFunc("/upload", handlers.LoggingMiddleware(SFTPWrapper.UploadFileHandler))
-	mux.HandleFunc("/createdir", handlers.LoggingMiddleware(SFTPWrapper.CreateDirHandler))
+
+	MainMux.HandleFunc("/", SFTPWrapper.ListFilesHandler)
+
 
 	log.Printf("Server starting on http://%s:%d...",cfg.Server.Host, cfg.Server.Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d",cfg.Server.Host, cfg.Server.Port), mux))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d",cfg.Server.Host, cfg.Server.Port), MainMux))
 }

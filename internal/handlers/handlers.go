@@ -73,11 +73,11 @@ func (sftp *ServerFTPWrapper) ListFilesHandler(w http.ResponseWriter, r *http.Re
 	theme := GetTheme(r)
 	data := struct {
 		CurrentPath string
-		Theme 		string
+		Theme 	string
 		Files []models.File
 	}{
 		CurrentPath: currentPath,
-		Theme: 		theme,
+		Theme: 	theme,
 		Files: files,
 	}
 
@@ -249,6 +249,12 @@ func (sftp *ServerFTPWrapper) ScanFiles(path string, basePath string) ([]models.
 	if err != nil {
 		return nil, fmt.Errorf("scan error for %s: %w", path, err)
 	}
+	fmt.Println("=============")
+	for _, entry := range entries {
+		fmt.Println(entry.Name())
+	}
+	fmt.Println("=============")
+	fmt.Println(basePath)
 
 	// Добавляем ссылку на родительскую директорию
 	if path != sftp.Cfg.FTP.RootPath {
@@ -266,7 +272,7 @@ func (sftp *ServerFTPWrapper) ScanFiles(path string, basePath string) ([]models.
 			continue
 		}
 
-		relPath := filepath.Join(basePath, entry.Name())
+		relPath := filepath.ToSlash(filepath.Join(basePath, entry.Name())) // fix file path convert url
 		if basePath == "/" {
 			relPath = "/" + entry.Name()
 		}
